@@ -21,6 +21,10 @@
       --border: #e5e7eb;
       --shadow: rgba(0, 0, 0, 0.1);
       --shadow-lg: rgba(0, 0, 0, 0.15);
+      /* CLI Specific Colors */
+      --cli-bg: #111827;
+      --cli-text: #28ff28; /* Neon Green */
+      --cli-primary: #6366f1;
     }
 
     * {
@@ -36,6 +40,86 @@
       line-height: 1.6;
       overflow-x: hidden;
     }
+
+    /* --- CLI INTRO STYLES (NEW) --- */
+    #cli-game-intro {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: var(--cli-bg);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: flex-start;
+      padding: 20px;
+      font-family: 'Monospace', 'Courier New', monospace;
+      color: var(--cli-text);
+      overflow-y: auto;
+      opacity: 1;
+      transition: opacity 1s ease-in-out;
+    }
+
+    .scan-line-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      background: linear-gradient(
+        rgba(18, 16, 16, 0) 50%,
+        rgba(0, 0, 0, 0.25) 50%
+      );
+      background-size: 100% 4px;
+      z-index: 1;
+      opacity: 0.2;
+    }
+
+    .terminal-output p {
+      margin: 0;
+      padding: 2px 0;
+      line-height: 1.2;
+      white-space: pre-wrap;
+    }
+
+    .terminal-input-line {
+      display: flex;
+      width: 100%;
+      align-items: center;
+      margin-top: 10px;
+    }
+
+    .terminal-prompt {
+      color: var(--cli-primary);
+      margin-right: 5px;
+      font-weight: bold;
+    }
+
+    #terminal-input {
+      background: none;
+      border: none;
+      color: var(--cli-text);
+      caret-color: var(--cli-text);
+      font-family: inherit;
+      font-size: 1em;
+      padding: 0;
+      outline: none;
+      flex-grow: 1;
+      animation: blink-cursor 1s step-end infinite;
+      min-width: 0; /* Allows input to shrink */
+    }
+
+    @keyframes blink-cursor {
+      from, to { border-right: 1px solid transparent; }
+      50% { border-right: 1px solid var(--cli-text); }
+    }
+    
+    .cli-success { color: var(--accent); font-weight: bold; }
+    .cli-error { color: #ff5f57; font-weight: bold; }
+    .cli-info { color: var(--secondary); }
 
     /* Custom Scrollbar */
     ::-webkit-scrollbar {
@@ -495,7 +579,7 @@
     }
 
     .browser-dots span:nth-child(1) { background: #ff5f57; }
-    .browser-dots span:nth-child(2) { background: #ffbd2e; }
+    I.browser-dots span:nth-child(2) { background: #ffbd2e; }
     .browser-dots span:nth-child(3) { background: #28ca42; }
 
     .browser-url {
@@ -853,7 +937,26 @@
     /* Responsive Design */
     @media (max-width: 768px) {
       .nav-links {
+        /* Mobile menu links should be hidden by default on mobile */
         display: none;
+        flex-direction: column;
+        position: absolute;
+        top: 80px;
+        left: 0;
+        width: 100%;
+        background: rgba(255, 255, 255, 0.95);
+        border-top: 1px solid var(--border);
+        padding: 1rem 0;
+        box-shadow: 0 4px 20px var(--shadow);
+      }
+      
+      .nav-links.open {
+        display: flex;
+      }
+      
+      .nav-links li {
+        text-align: center;
+        padding: 0.5rem 0;
       }
 
       .mobile-menu {
@@ -917,318 +1020,485 @@
   </style>
 </head>
 <body>
-  <!-- Navigation -->
-  <nav id="navbar">
+  <!-- CLI Game Introduction Screen -->
+  <div id="cli-game-intro">
+    <div class="scan-line-overlay"></div>
+    <div class="terminal-output" id="terminal-output">
+      <p style="color:var(--cli-primary)">--- P.T. SYSTEM 1.0.2 BOOT SEQUENCE ---</p>
+      <p></p>
+      <p style="color:#ffbd2e;">[WARN] Accessing Public Log. System Initialization Required.</p>
+      <p style="color:var(--secondary);">[INFO] Checking system integrity... OK</p>
+      <p style="color:var(--secondary);">[INFO] Loading core modules... Complete</p>
+      <p style="color:var(--secondary);">[INFO] Interface: 'Prayas Thapa | Web Developer & Founder' loaded.</p>
+      <p></p>
+      <p>SYSTEM READY.</p>
+      <p>To continue to the portfolio, type <span class="cli-success">RUN PORTFOLIO</span> and press Enter.</p>
+      <p><span class="cli-info">Available Commands: </span><span class="cli-success">RUN PORTFOLIO</span>, HELP, VERSION</p>
+      <!-- The instruction now inherits the default terminal green color -->
+      <p>(No, this isn't a glitch, literally just type in RUN PORTFOLIO if you don't understand what the top commands say)</p>
+      <p></p>
+    </div>
+    <div class="terminal-input-line">
+      <span class="terminal-prompt">USER@PT-PORTFOLIO:~$</span>
+      <input type="text" id="terminal-input" autofocus autocomplete="off" />
+    </div>
+  </div>
+
+  <!-- Navigation (Needs to be outside the main content wrapper for z-index control) -->
+  <nav id="navbar" style="opacity: 0; pointer-events: none;">
     <div class="nav-container">
       <div class="logo">PT</div>
-      <ul class="nav-links">
+      <ul class="nav-links" id="nav-links">
         <li><a href="#home">Home</a></li>
         <li><a href="#about">About</a></li>
         <li><a href="#skills">Skills</a></li>
         <li><a href="#services">Services</a></li>
-        <li><a href="#contact">Contact</a></li>
+        <li><a href="#contact">Contact</a></a></li>
       </ul>
-      <div class="mobile-menu">
+      <div class="mobile-menu" id="mobile-menu-btn">
         <i class="fas fa-bars"></i>
       </div>
     </div>
   </nav>
 
-  <!-- Hero Section -->
-  <section id="home" class="hero">
-    <div class="hero-content">
-      <p class="hero-subtitle">👋 Hello, I'm</p>
-      <h1 class="hero-title">Prayas Thapa</h1>
-      <p class="hero-description">
-        Front-End Software Developer
-      </p>
-      <div class="hero-buttons">
-        <a href="#about" class="btn btn-primary">Discover My Work</a>
-        <a href="#contact" class="btn btn-secondary">Let's Connect</a>
+  <!-- Main Portfolio Content (Initially hidden) -->
+  <div id="main-portfolio-content" style="opacity: 0; transition: opacity 1s ease-in-out;">
+    
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+      <div class="hero-content">
+        <p class="hero-subtitle">👋 Hello, I'm</p>
+        <h1 class="hero-title">Prayas Thapa</h1>
+        <p class="hero-description">
+          Front-End Software Developer
+        </p>
+        <div class="hero-buttons">
+          <a href="#about" class="btn btn-primary">Discover My Work</a>
+          <a href="#contact" class="btn btn-secondary">Let's Connect</a>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- About Section -->
-  <section id="about" class="section">
-    <div class="section-header">
-      <p class="section-subtitle">Get to know me</p>
-      <h2 class="section-title">About Me</h2>
-      <p class="section-description">
-        Passionate developer and entrepreneur with a mission to democratize education through technology.
-      </p>
-    </div>
-    <div class="about-content">
-      <div class="about-text">
-        <p>
-          I'm an aspiring electrical engineer and dedicated front-end developer with a passion for AI, technology, software, and systems. As the founder of <span class="highlight">Alvric Technologies LLC</span>, I build modern front-end and back-end solutions for local businesses, combining clean design with scalable software. Turning my clients visions into reality. I also am in-current development on <span class="highlight">MemoLearning</span> which is an innovative, interactive and AI-powered STEM learning platform designed to make learning both intuitive and accessible to every single student.
-        </p>
-        <br>
-        <p>
-          I focus on creating technology that is intuitive, impactful, and accessible. My goal is to design systems that empower people, whether through business software or innovative learning platforms and communities.
+    <!-- About Section -->
+    <section id="about" class="section">
+      <div class="section-header">
+        <p class="section-subtitle">Get to know me</p>
+        <h2 class="section-title">About Me</h2>
+        <p class="section-description">
+          Passionate developer and entrepreneur with a mission to democratize education through technology.
         </p>
       </div>
-      <div class="about-stats">
-        <div class="stat-card">
-          <div class="stat-number">7+</div>
-          <div class="stat-label">Programming Languages</div>
+      <div class="about-content">
+        <div class="about-text">
+          <p>
+            I'm an aspiring electrical engineer and dedicated front-end developer with a passion for AI, technology, software, and systems. As the founder of <span class="highlight">Alvric Technologies LLC</span>, I build modern front-end and back-end solutions for local businesses, combining clean design with scalable software. Turning my clients visions into reality. I also am in-current development on <span class="highlight">MemoLearning</span> which is an innovative, interactive and AI-powered STEM learning platform designed to make learning both intuitive and accessible to every single student.
+          </p>
+          <br>
+          <p>
+            I focus on creating technology that is intuitive, impactful, and accessible. My goal is to design systems that empower people, whether through business software or innovative learning platforms and communities.
+          </p>
         </div>
-        <div class="stat-card">
-          <div class="stat-number">1</div>
-          <div class="stat-label">Startup Founded</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-number">100%</div>
-          <div class="stat-label">Passion Driven</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-number">∞</div>
-          <div class="stat-label">Learning Never Stops</div>
+        <div class="about-stats">
+          <div class="stat-card">
+            <div class="stat-number">7+</div>
+            <div class="stat-label">Programming Languages</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">1</div>
+            <div class="stat-label">Startup Founded</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">100%</div>
+            <div class="stat-label">Passion Driven</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">∞</div>
+            <div class="stat-label">Learning Never Stops</div>
+          </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Skills Section -->
-  <section id="skills" class="section">
-    <div class="section-header">
-      <p class="section-subtitle">My expertise</p>
-      <h2 class="section-title">Technical Skills</h2>
-      <p class="section-description">
-        A comprehensive toolkit spanning multiple disciplines and technologies.
-      </p>
-    </div>
-    <div class="skills-grid">
-      <div class="skill-category">
-        <div class="skill-icon">
-          <i class="fas fa-code"></i>
-        </div>
-        <h3 class="skill-title">Programming Languages</h3>
-        <ul class="skill-list">
-          <li>Python</li>
-          <li>JavaScript</li>
-          <li>HTML5 & CSS3</li>
-          <li>SQL</li>
-          <li>Java</li>
-          <li>Lua</li>
-        </ul>
+    <!-- Skills Section -->
+    <section id="skills" class="section">
+      <div class="section-header">
+        <p class="section-subtitle">My expertise</p>
+        <h2 class="section-title">Technical Skills</h2>
+        <p class="section-description">
+          A comprehensive toolkit spanning multiple disciplines and technologies.
+        </p>
       </div>
-      <div class="skill-category">
-        <div class="skill-icon">
-          <i class="fas fa-tools"></i>
+      <div class="skills-grid">
+        <div class="skill-category">
+          <div class="skill-icon">
+            <i class="fas fa-code"></i>
+          </div>
+          <h3 class="skill-title">Programming Languages</h3>
+          <ul class="skill-list">
+            <li>Python</li>
+            <li>JavaScript</li>
+            <li>HTML5 & CSS3</li>
+            <li>SQL</li>
+            <li>Java</li>
+            <li>Lua</li>
+          </ul>
         </div>
-        <h3 class="skill-title">Frameworks & Tools</h3>
-        <ul class="skill-list">
-          <li>Git & Version Control</li>
-          <li>VS Code</li>
-          <li>Bootstrap</li>
-          <li>Modern Web Development</li>
-        </ul>
-      </div>
-      <div class="skill-category">
-        <div class="skill-icon">
-          <i class="fas fa-chart-line"></i>
+        <div class="skill-category">
+          <div class="skill-icon">
+            <i class="fas fa-tools"></i>
+          </div>
+          <h3 class="skill-title">Frameworks & Tools</h3>
+          <ul class="skill-list">
+            <li>Git & Version Control</li>
+            <li>VS Code</li>
+            <li>Bootstrap</li>
+            <li>Modern Web Development</li>
+          </ul>
         </div>
-        <h3 class="skill-title">Domains</h3>
-        <ul class="skill-list">
-          <li>Data Science</li>
-          <li>Mathematics</li>
-          <li>Finance</li>
-          <li>Computer Science</li>
-          <li>Educational Technology</li>
-        </ul>
-      </div>
-      <div class="skill-category">
-        <div class="skill-icon">
-          <i class="fas fa-lightbulb"></i>
+        <div class="skill-category">
+          <div class="skill-icon">
+            <i class="fas fa-chart-line"></i>
+          </div>
+          <h3 class="skill-title">Domains</h3>
+          <ul class="skill-list">
+            <li>Data Science</li>
+            <li>Mathematics</li>
+            <li>Finance</li>
+            <li>Computer Science</li>
+            <li>Educational Technology</li>
+          </ul>
         </div>
-        <h3 class="skill-title">Core Strengths</h3>
-        <ul class="skill-list">
-          <li>Critical Thinking</li>
-          <li>Problem Solving</li>
-          <li>Team Leadership</li>
-          <li>Innovation</li>
-          <li>Analytical Mindset</li>
-        </ul>
+        <div class="skill-category">
+          <div class="skill-icon">
+            <i class="fas fa-lightbulb"></i>
+          </div>
+          <h3 class="skill-title">Core Strengths</h3>
+          <ul class="skill-list">
+            <li>Critical Thinking</li>
+            <li>Problem Solving</li>
+            <li>Team Leadership</li>
+            <li>Innovation</li>
+            <li>Analytical Mindset</li>
+          </ul>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
 
 
-  <!-- Services Section -->
-  <section id="services" class="section">
-    <div class="section-header">
-      <p class="section-subtitle">What I offer</p>
-      <h2 class="section-title">Services</h2>
-      <p class="section-description">
-        Comprehensive solutions for your digital and educational needs.
-      </p>
-    </div>
-    <div class="services-grid">
-      <div class="service-card">
-        <div class="service-icon">
-          <i class="fas fa-laptop-code"></i>
-        </div>
-        <h3 class="service-title">Custom Website Development</h3>
-        <p class="service-description">
-          Tailored, fast, and responsive websites using modern HTML, CSS, and JavaScript practices. 
-          Built with performance, accessibility, and user experience in mind.
+    <!-- Services Section -->
+    <section id="services" class="section">
+      <div class="section-header">
+        <p class="section-subtitle">What I offer</p>
+        <h2 class="section-title">Services</h2>
+        <p class="section-description">
+          Comprehensive solutions for your digital and educational needs.
         </p>
       </div>
-      <div class="service-card">
-        <div class="service-icon">
-          <i class="fas fa-rocket"></i>
+      <div class="services-grid">
+        <div class="service-card">
+          <div class="service-icon">
+            <i class="fas fa-laptop-code"></i>
+          </div>
+          <h3 class="service-title">Custom Website Development</h3>
+          <p class="service-description">
+            Tailored, fast, and responsive websites using modern HTML, CSS, and JavaScript practices.  
+            Built with performance, accessibility, and user experience in mind.
+          </p>
         </div>
-        <h3 class="service-title">Technical Consulting</h3>
-        <p class="service-description">
-          Partnering with startups and businesses to bring digital ideas to life through scalable, 
-          maintainable code. From concept to deployment.
-        </p>
-      </div>
-      <div class="service-card">
-        <div class="service-icon">
-          <i class="fas fa-paint-brush"></i>
+        <div class="service-card">
+          <div class="service-icon">
+            <i class="fas fa-rocket"></i>
+          </div>
+          <h3 class="service-title">Technical Consulting</h3>
+          <p class="service-description">
+            Partnering with startups and businesses to bring digital ideas to life through scalable,  
+            maintainable code. From concept to deployment.
+          </p>
         </div>
-        <h3 class="service-title">Frontend Architecture</h3>
-        <p class="service-description">
-          Optimized web structures with clean UI design and performance-focused development. 
-          Creating interfaces that users love.
-        </p>
-      </div>
-      <div class="service-card">
-        <div class="service-icon">
-          <i class="fas fa-graduation-cap"></i>
+        <div class="service-card">
+          <div class="service-icon">
+            <i class="fas fa-paint-brush"></i>
+          </div>
+          <h3 class="service-title">Frontend Architecture</h3>
+          <p class="service-description">
+            Optimized web structures with clean UI design and performance-focused development.  
+            Creating interfaces that users love.
+          </p>
         </div>
-        <h3 class="service-title">Math & CS Tutoring</h3>
-        <p class="service-description">
-          High school tutoring in mathematics and computer science.
-        </p>
+        <div class="service-card">
+          <div class="service-icon">
+            <i class="fas fa-graduation-cap"></i>
+          </div>
+          <h3 class="service-title">Math & CS Tutoring</h3>
+          <p class="service-description">
+            High school tutoring in mathematics and computer science.
+          </p>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- MemoLearning Section -->
-  <section class="section">
-    <div class="memolearning">
-      <div class="memolearning-content">
-        <h2 class="memolearning-title">🚀 MemoLearning Mission</h2>
-        <p class="memolearning-description">
-          MemoLearning is my personal mission to democratize access to high-quality education in mathematics, 
-          finance, computer science, and beyond. The goal is to provide a modern, engaging, and free learning 
-          experience for students and self-learners worldwide. By integrating practical problem-solving, 
-          data literacy, and foundational theory, MemoLearning empowers the next generation of thinkers, 
-          creators, and innovator. Regardless of where they begin.
-        </p>
+    <!-- MemoLearning Section -->
+    <section class="section">
+      <div class="memolearning">
+        <div class="memolearning-content">
+          <h2 class="memolearning-title">🚀 MemoLearning Mission</h2>
+          <p class="memolearning-description">
+            MemoLearning is my personal mission to democratize access to high-quality education in mathematics,  
+            finance, computer science, and beyond. The goal is to provide a modern, engaging, and free learning  
+            experience for students and self-learners worldwide. By integrating practical problem-solving,  
+            data literacy, and foundational theory, MemoLearning empowers the next generation of thinkers,  
+            creators, and innovator. Regardless of where they begin.
+          </p>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Footer -->
-  <footer id="contact">
-    <div class="footer-content">
-      <h2 class="footer-title">Let's Work Together</h2>
-      <p class="footer-description">
-        Ready to bring your ideas to life? Let's create something amazing together.
-      </p>
-      <div class="contact-info">
-        <a href="mailto:prayasthapa0522@gmail.com" class="contact-item">
-          <i class="fas fa-envelope"></i> prayasthapa0522@gmail.com
-        </a>
-        <a href="tel:401-489-9230" class="contact-item">
-          <i class="fas fa-phone"></i> 401-489-9230
-        </a>
+    <!-- Footer -->
+    <footer id="contact">
+      <div class="footer-content">
+        <h2 class="footer-title">Let's Work Together</h2>
+        <p class="footer-description">
+          Ready to bring your ideas to life? Let's create something amazing together.
+        </p>
+        <div class="contact-info">
+          <a href="mailto:prayasthapa0522@gmail.com" class="contact-item">
+            <i class="fas fa-envelope"></i> prayasthapa0522@gmail.com
+          </a>
+          <a href="tel:401-489-9230" class="contact-item">
+            <i class="fas fa-phone"></i> 401-489-9230
+          </a>
+        </div>
+        <div class="social-links">
+          <a href="https://www.linkedin.com/in/prayasthapa22/" class="social-link" target="_blank">
+            <i class="fab fa-linkedin"></i>
+          </a>
+          <a href="mailto:prayasthapa0522@gmail.com" class="social-link">
+            <i class="fas fa-envelope"></i>
+          </a>
+        </div>
+        <div class="footer-bottom">
+          <p>&copy; 2025 Prayas Thapa. All rights reserved.</p>
+        </div>
       </div>
-      <div class="social-links">
-        <a href="https://www.linkedin.com/in/prayasthapa22/" class="social-link" target="_blank">
-          <i class="fab fa-linkedin"></i>
-        </a>
-        <a href="mailto:prayasthapa0522@gmail.com" class="social-link">
-          <i class="fas fa-envelope"></i>
-        </a>
-      </div>
-      <div class="footer-bottom">
-        <p>&copy; 2025 Prayas Thapa. All rights reserved.</p>
-      </div>
-    </div>
-  </footer>
+    </footer>
+  </div>
 
   <script>
-    // Navbar scroll effect
-    window.addEventListener('scroll', function() {
-      const navbar = document.getElementById('navbar');
-      if (window.scrollY > 50) {
-        navbar.classList.add('scrolled');
-      } else {
-        navbar.classList.remove('scrolled');
-      }
-    });
+    document.addEventListener('DOMContentLoaded', () => {
+        const cliIntro = document.getElementById('cli-game-intro');
+        const terminalOutput = document.getElementById('terminal-output');
+        const terminalInput = document.getElementById('terminal-input');
+        const mainContent = document.getElementById('main-portfolio-content');
+        const navbar = document.getElementById('navbar');
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const navLinks = document.getElementById('nav-links');
+        
+        // Focus the input field immediately and set up a focus loop
+        terminalInput.focus();
 
-    // Smooth scrolling for navigation links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-          target.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-          });
+        function keepFocus() {
+            if (cliIntro && cliIntro.style.opacity === '1') {
+                terminalInput.focus();
+            }
         }
-      });
-    });
+        // Keep checking focus every second to prevent loss of focus in the iframe environment
+        const focusInterval = setInterval(keepFocus, 1000); 
 
-    // Intersection Observer for animations
-    const observerOptions = {
-      threshold: 0.1,
-      rootMargin: '0px 0px -50px 0px'
-    };
+        const COMMAND_MAP = {
+            'RUN PORTFOLIO': loadPortfolio,
+            'HELP': showHelp,
+            'VERSION': showVersion,
+        };
 
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.style.opacity = '1';
-          entry.target.style.transform = 'translateY(0)';
+        const MAX_HISTORY = 30;
+        
+        /**
+         * Appends text to the terminal output area.
+         * @param {string} text - The content to append.
+         * @param {string} className - Optional class for styling (e.g., 'cli-error').
+         */
+        function appendOutput(text, className = '') {
+            const p = document.createElement('p');
+            p.innerHTML = text;
+            if (className) p.classList.add(className);
+            terminalOutput.appendChild(p);
+
+            // Keep only the last N lines
+            while (terminalOutput.children.length > MAX_HISTORY) {
+                terminalOutput.removeChild(terminalOutput.firstChild);
+            }
+
+            // Scroll to the bottom
+            cliIntro.scrollTop = cliIntro.scrollHeight;
         }
-      });
-    }, observerOptions);
 
-    // Observe elements for scroll animations
-    document.querySelectorAll('.skill-category, .service-card, .stat-card, .project-card').forEach(el => {
-      el.style.opacity = '0';
-      el.style.transform = 'translateY(30px)';
-      el.style.transition = 'all 0.6s ease-out';
-      observer.observe(el);
-    });
+        /**
+         * Clears the input field and handles the command execution.
+         */
+        function handleInput(event) {
+            if (event.key === 'Enter') {
+                const command = terminalInput.value.trim().toUpperCase();
+                
+                // Echo the command first
+                appendOutput(`<span class="terminal-prompt">USER@PT-PORTFOLIO:~$</span> ${terminalInput.value}`);
+                
+                // Clear the input
+                terminalInput.value = '';
 
-    // Add hover effects to buttons
-    document.querySelectorAll('.btn').forEach(btn => {
-      btn.addEventListener('mouseenter', function() {
-        this.style.transform = 'translateY(-2px)';
-      });
-      
-      btn.addEventListener('mouseleave', function() {
-        this.style.transform = 'translateY(0)';
-      });
-    });
+                const action = COMMAND_MAP[command];
+                if (action) {
+                    action();
+                } else if (command === '') {
+                    // Do nothing for empty input
+                } else {
+                    appendOutput(`[ERROR] Unknown command: ${command}. Type <span class="cli-success">HELP</span> for a list of commands.`, 'cli-error');
+                }
+            }
+        }
 
-    // Parallax effect for hero section
-    window.addEventListener('scroll', () => {
-      const scrolled = window.pageYOffset;
-      const hero = document.querySelector('.hero');
-      if (hero) {
-        hero.style.transform = `translateY(${scrolled * 0.5}px)`;
-      }
-    });
+        /**
+         * Function to load and display the main portfolio content.
+         */
+        function loadPortfolio() {
+            appendOutput('<span class="cli-success">[SUCCESS] EXECUTE PORTFOLIO...</span>');
+            appendOutput('[INFO] Shutting down CLI interface. Standby...');
+            
+            terminalInput.disabled = true;
+            clearInterval(focusInterval); // Stop the focus loop
 
-    // Add loading animation
-    window.addEventListener('load', function() {
-      document.body.style.opacity = '1';
-    });
+            setTimeout(() => {
+                // 1. Hide the CLI
+                cliIntro.style.opacity = '0';
+                
+                // 2. Show the main content and navbar
+                mainContent.style.opacity = '1';
+                navbar.style.opacity = '1';
+                navbar.style.pointerEvents = 'auto';
 
-    // Mobile menu functionality (basic implementation)
-    document.querySelector('.mobile-menu').addEventListener('click', function() {
-      const navLinks = document.querySelector('.nav-links');
-      navLinks.style.display = navLinks.style.display === 'flex' ? 'none' : 'flex';
+                // 3. Remove the CLI element after transition
+                setTimeout(() => {
+                    cliIntro.remove();
+                    // Ensure body can scroll again
+                    document.body.style.overflowY = 'auto';
+                }, 1000); 
+
+            }, 1000);
+        }
+        
+        /**
+         * Function to display available commands.
+         */
+        function showHelp() {
+            appendOutput('');
+            appendOutput('<span style="color:var(--cli-primary);">--- HELP MENU ---</span>');
+            appendOutput(`- <span class="cli-success">RUN PORTFOLIO</span>: Executes the main portfolio interface.`);
+            appendOutput(`- <span class="cli-info">HELP</span>: Displays this command list.`);
+            appendOutput(`- <span class="cli-info">VERSION</span>: Displays the system version.`);
+            appendOutput('');
+        }
+
+        /**
+         * Function to show version info.
+         */
+        function showVersion() {
+            appendOutput(`[INFO] Prayas Thapa Portfolio System: <span class="cli-success">v1.0.2</span> (2025-05-22 Build)`);
+        }
+
+        // Attach event listener to the input field
+        terminalInput.addEventListener('keydown', handleInput);
+
+        // Prevent body scrolling while CLI is active
+        document.body.style.overflowY = 'hidden';
+
+        // ------------------------------------------------------------------
+        // EXISTING PORTFOLIO JS (Updated to run after CLI is dismissed)
+        // ------------------------------------------------------------------
+
+        // Mobile menu functionality (basic implementation)
+        mobileMenuBtn.addEventListener('click', function() {
+            navLinks.classList.toggle('open');
+        });
+        
+        // Hide mobile menu when a link is clicked
+        navLinks.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                navLinks.classList.remove('open');
+            });
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (navbar && window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else if (navbar) {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                // Only animate if the main content is visible (CLI is gone)
+                if (mainContent && mainContent.style.opacity === '1' && entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe elements for scroll animations
+        document.querySelectorAll('.skill-category, .service-card, .stat-card, .project-card').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'all 0.6s ease-out';
+            observer.observe(el);
+        });
+
+        // Add hover effects to buttons
+        document.querySelectorAll('.btn').forEach(btn => {
+            btn.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-2px)';
+            });
+            
+            btn.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+
+        // Parallax effect for hero section
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const hero = document.querySelector('.hero');
+            // Only apply parallax if the CLI is dismissed and the hero element exists
+            if (cliIntro.style.opacity === '0' && hero) {
+                hero.style.transform = `translateY(${scrolled * 0.5}px)`;
+            }
+        });
+
+        // Add loading animation
+        window.addEventListener('load', function() {
+            // Note: We don't change body opacity here, the CLI handles the intro.
+        });
     });
   </script>
 </body>
