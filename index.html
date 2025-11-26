@@ -1,1505 +1,535 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Prayas Thapa | Web Developer & Founder</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <style>
-    :root {
-      --primary: #6366f1;
-      --primary-dark: #4f46e5;
-      --secondary: #06b6d4;
-      --accent: #f59e0b;
-      --text-primary: #1f2937;
-      --text-secondary: #6b7280;
-      --text-light: #9ca3af;
-      --bg-primary: #ffffff;
-      --bg-secondary: #f9fafb;
-      --bg-dark: #111827;
-      --border: #e5e7eb;
-      --shadow: rgba(0, 0, 0, 0.1);
-      --shadow-lg: rgba(0, 0, 0, 0.15);
-      /* CLI Specific Colors */
-      --cli-bg: #111827;
-      --cli-text: #28ff28; /* Neon Green */
-      --cli-primary: #6366f1;
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Inter', sans-serif;
-      background: var(--bg-primary);
-      color: var(--text-primary);
-      line-height: 1.6;
-      overflow-x: hidden;
-    }
-
-    /* --- CLI INTRO STYLES (NEW) --- */
-    #cli-game-intro {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background-color: var(--cli-bg);
-      z-index: 9999;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      align-items: flex-start;
-      padding: 20px;
-      font-family: 'Monospace', 'Courier New', monospace;
-      color: var(--cli-text);
-      overflow-y: auto;
-      opacity: 1;
-      transition: opacity 1s ease-in-out;
-    }
-
-    .scan-line-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      background: linear-gradient(
-        rgba(18, 16, 16, 0) 50%,
-        rgba(0, 0, 0, 0.25) 50%
-      );
-      background-size: 100% 4px;
-      z-index: 1;
-      opacity: 0.2;
-    }
-
-    .terminal-output p {
-      margin: 0;
-      padding: 2px 0;
-      line-height: 1.2;
-      white-space: pre-wrap;
-    }
-
-    .terminal-input-line {
-      display: flex;
-      width: 100%;
-      align-items: center;
-      margin-top: 10px;
-    }
-
-    .terminal-prompt {
-      color: var(--cli-primary);
-      margin-right: 5px;
-      font-weight: bold;
-    }
-
-    #terminal-input {
-      background: none;
-      border: none;
-      color: var(--cli-text);
-      caret-color: var(--cli-text);
-      font-family: inherit;
-      font-size: 1em;
-      padding: 0;
-      outline: none;
-      flex-grow: 1;
-      animation: blink-cursor 1s step-end infinite;
-      min-width: 0; /* Allows input to shrink */
-    }
-
-    @keyframes blink-cursor {
-      from, to { border-right: 1px solid transparent; }
-      50% { border-right: 1px solid var(--cli-text); }
-    }
-    
-    .cli-success { color: var(--accent); font-weight: bold; }
-    .cli-error { color: #ff5f57; font-weight: bold; }
-    .cli-info { color: var(--secondary); }
-
-    /* Custom Scrollbar */
-    ::-webkit-scrollbar {
-      width: 8px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: var(--bg-secondary);
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: var(--primary);
-      border-radius: 4px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-      background: var(--primary-dark);
-    }
-
-    /* Navigation */
-    nav {
-      position: fixed;
-      top: 0;
-      width: 100%;
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--border);
-      z-index: 1000;
-      transition: all 0.3s ease;
-    }
-
-    nav.scrolled {
-      background: rgba(255, 255, 255, 0.98);
-      box-shadow: 0 4px 20px var(--shadow);
-    }
-
-    .nav-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      height: 80px;
-    }
-
-    .logo {
-      font-size: 1.5rem;
-      font-weight: 800;
-      color: var(--primary);
-    }
-
-    .nav-links {
-      display: flex;
-      list-style: none;
-      gap: 2rem;
-    }
-
-    .nav-links a {
-      text-decoration: none;
-      color: var(--text-secondary);
-      font-weight: 500;
-      transition: color 0.3s ease;
-      position: relative;
-    }
-
-    .nav-links a:hover {
-      color: var(--primary);
-    }
-
-    .nav-links a::after {
-      content: '';
-      position: absolute;
-      width: 0;
-      height: 2px;
-      bottom: -5px;
-      left: 0;
-      background: var(--primary);
-      transition: width 0.3s ease;
-    }
-
-    .nav-links a:hover::after {
-      width: 100%;
-    }
-
-    /* Hero Section */
-    .hero {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, 
-        rgba(99, 102, 241, 0.05) 0%, 
-        rgba(6, 182, 212, 0.05) 50%, 
-        rgba(245, 158, 11, 0.05) 100%);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .hero::before {
-      content: '';
-      position: absolute;
-      width: 200%;
-      height: 200%;
-      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="0.5" fill="%23374151" opacity="0.1"/><circle cx="75" cy="75" r="0.5" fill="%236366f1" opacity="0.1"/><circle cx="50" cy="50" r="0.3" fill="%2306b6d4" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
-      animation: float 20s ease-in-out infinite;
-      opacity: 0.3;
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translate(-10px, -10px) rotate(0deg); }
-      50% { transform: translate(10px, 10px) rotate(1deg); }
-    }
-
-    .hero-content {
-      text-align: center;
-      max-width: 800px;
-      padding: 0 2rem;
-      position: relative;
-      z-index: 2;
-    }
-
-    .hero-subtitle {
-      color: var(--primary);
-      font-weight: 600;
-      font-size: 1.1rem;
-      margin-bottom: 1rem;
-      opacity: 0;
-      animation: fadeInUp 0.8s ease-out 0.2s forwards;
-    }
-
-    .hero-title {
-      font-size: clamp(2.5rem, 5vw, 4rem);
-      font-weight: 900;
-      line-height: 1.1;
-      margin-bottom: 1.5rem;
-      background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      opacity: 0;
-      animation: fadeInUp 0.8s ease-out 0.4s forwards;
-    }
-
-    .hero-description {
-      font-size: 1.2rem;
-      color: var(--text-secondary);
-      margin-bottom: 2rem;
-      opacity: 0;
-      animation: fadeInUp 0.8s ease-out 0.6s forwards;
-    }
-
-    .hero-buttons {
-      display: flex;
-      gap: 1rem;
-      justify-content: center;
-      flex-wrap: wrap;
-      opacity: 0;
-      animation: fadeInUp 0.8s ease-out 0.8s forwards;
-    }
-
-    .btn {
-      padding: 0.875rem 2rem;
-      border-radius: 50px;
-      font-weight: 600;
-      text-decoration: none;
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      color: white;
-      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
-    }
-
-    .btn-secondary {
-      background: white;
-      color: var(--primary);
-      border: 2px solid var(--primary);
-    }
-
-    .btn-secondary:hover {
-      background: var(--primary);
-      color: white;
-      transform: translateY(-2px);
-    }
-
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    /* Sections */
-    .section {
-      padding: 5rem 2rem;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    .section-header {
-      text-align: center;
-      margin-bottom: 4rem;
-    }
-
-    .section-subtitle {
-      color: var(--primary);
-      font-weight: 600;
-      font-size: 1rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .section-title {
-      font-size: 2.5rem;
-      font-weight: 800;
-      margin-bottom: 1rem;
-      color: var(--text-primary);
-    }
-
-    .section-description {
-      font-size: 1.1rem;
-      color: var(--text-secondary);
-      max-width: 600px;
-      margin: 0 auto;
-    }
-
-    /* About Section */
-    .about-content {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 4rem;
-      align-items: center;
-    }
-
-    .about-text {
-      font-size: 1.1rem;
-      color: var(--text-secondary);
-      line-height: 1.8;
-    }
-
-    .about-text .highlight {
-      color: var(--primary);
-      font-weight: 600;
-    }
-
-    .about-stats {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2rem;
-    }
-
-    .stat-card {
-      background: white;
-      padding: 2rem;
-      border-radius: 20px;
-      box-shadow: 0 4px 20px var(--shadow);
-      text-align: center;
-      transition: transform 0.3s ease;
-    }
-
-    .stat-card:hover {
-      transform: translateY(-5px);
-    }
-
-    .stat-number {
-      font-size: 2.5rem;
-      font-weight: 900;
-      color: var(--primary);
-      margin-bottom: 0.5rem;
-    }
-
-    .stat-label {
-      color: var(--text-secondary);
-      font-weight: 500;
-    }
-
-    /* Skills Section */
-    .skills-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 2rem;
-    }
-
-    .skill-category {
-      background: white;
-      padding: 2.5rem;
-      border-radius: 20px;
-      box-shadow: 0 4px 20px var(--shadow);
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .skill-category::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-    }
-
-    .skill-category:hover {
-      transform: translateY(-10px);
-      box-shadow: 0 20px 40px var(--shadow-lg);
-    }
-
-    .skill-icon {
-      font-size: 2.5rem;
-      color: var(--primary);
-      margin-bottom: 1.5rem;
-    }
-
-    .skill-title {
-      font-size: 1.3rem;
-      font-weight: 700;
-      margin-bottom: 1rem;
-      color: var(--text-primary);
-    }
-
-    .skill-list {
-      list-style: none;
-    }
-
-    .skill-list li {
-      padding: 0.5rem 0;
-      color: var(--text-secondary);
-      position: relative;
-      padding-left: 1.5rem;
-    }
-
-    .skill-list li::before {
-      content: '→';
-      position: absolute;
-      left: 0;
-      color: var(--primary);
-      font-weight: bold;
-    }
-
-    /* Services Section */
-    .services-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 2rem;
-    }
-
-    .service-card {
-      background: linear-gradient(135deg, white, var(--bg-secondary));
-      padding: 3rem;
-      border-radius: 20px;
-      box-shadow: 0 4px 20px var(--shadow);
-      transition: all 0.3s ease;
-      border: 1px solid var(--border);
-    }
-
-    .service-card:hover {
-      transform: translateY(-10px);
-      box-shadow: 0 20px 40px var(--shadow-lg);
-    }
-
-    .service-icon {
-      font-size: 3rem;
-      color: var(--primary);
-      margin-bottom: 1.5rem;
-    }
-
-    .service-title {
-      font-size: 1.4rem;
-      font-weight: 700;
-      margin-bottom: 1rem;
-      color: var(--text-primary);
-    }
-
-    .service-description {
-      color: var(--text-secondary);
-      line-height: 1.7;
-    }
-
-    /* Portfolio Section */
-    .portfolio-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 3rem;
-      max-width: 1000px;
-      margin: 0 auto;
-    }
-
-    .project-card {
-      background: white;
-      border-radius: 24px;
-      overflow: hidden;
-      box-shadow: 0 4px 20px var(--shadow);
-      transition: all 0.3s ease;
-      border: 1px solid var(--border);
-    }
-
-    .project-card:hover {
-      transform: translateY(-10px);
-      box-shadow: 0 20px 40px var(--shadow-lg);
-    }
-
-    .project-card.featured {
-      border: 2px solid var(--primary);
-      background: linear-gradient(135deg, rgba(99, 102, 241, 0.02), rgba(6, 182, 212, 0.02));
-    }
-
-    .project-preview {
-      padding: 2rem;
-      background: var(--bg-secondary);
-    }
-
-    .project-browser {
-      background: white;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-      transform: perspective(1000px) rotateX(5deg);
-      transition: transform 0.3s ease;
-    }
-
-    .project-card:hover .project-browser {
-      transform: perspective(1000px) rotateX(0deg);
-    }
-
-    .browser-header {
-      background: #f0f0f0;
-      padding: 0.75rem 1rem;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      border-bottom: 1px solid #ddd;
-    }
-
-    .browser-dots {
-      display: flex;
-      gap: 0.5rem;
-    }
-
-    .browser-dots span {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background: #ccc;
-    }
-
-    .browser-dots span:nth-child(1) { background: #ff5f57; }
-    I.browser-dots span:nth-child(2) { background: #ffbd2e; }
-    .browser-dots span:nth-child(3) { background: #28ca42; }
-
-    .browser-url {
-      background: white;
-      padding: 0.25rem 1rem;
-      border-radius: 6px;
-      font-size: 0.85rem;
-      color: var(--text-secondary);
-      border: 1px solid #ddd;
-      flex: 1;
-      max-width: 300px;
-    }
-
-    .project-image {
-      height: 250px;
-      position: relative;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .mock-content {
-      width: 90%;
-      height: 80%;
-      background: rgba(255, 255, 255, 0.95);
-      border-radius: 8px;
-      padding: 1.5rem;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    }
-
-    .mock-header {
-      height: 6px;
-      background: rgba(0, 0, 0, 0.1);
-      border-radius: 3px;
-      width: 100%;
-    }
-
-    .mock-nav {
-      height: 4px;
-      background: rgba(0, 0, 0, 0.08);
-      border-radius: 2px;
-      width: 70%;
-    }
-
-    .mock-hero {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 0.8rem;
-    }
-
-    .mock-title {
-      height: 20px;
-      background: var(--primary);
-      border-radius: 4px;
-      width: 85%;
-      display: flex;
-      align-items: center;
-      padding: 0 1rem;
-      color: white;
-      font-size: 0.7rem;
-      font-weight: 700;
-    }
-
-    .mock-subtitle {
-      height: 12px;
-      background: rgba(0, 0, 0, 0.15);
-      border-radius: 6px;
-      width: 65%;
-    }
-
-    .mock-sections {
-      display: flex;
-      gap: 0.8rem;
-      height: 40px;
-    }
-
-    .mock-card {
-      flex: 1;
-      background: rgba(0, 0, 0, 0.05);
-      border-radius: 6px;
-      border: 1px solid rgba(0, 0, 0, 0.1);
-    }
-
-    .mock-gallery {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.8rem;
-      height: 50px;
-    }
-
-    .mock-image {
-      background: rgba(0, 0, 0, 0.08);
-      border-radius: 4px;
-      border: 1px solid rgba(0, 0, 0, 0.1);
-    }
-
-    .mock-features {
-      display: flex;
-      gap: 0.8rem;
-      height: 60px;
-    }
-
-    .feature-card {
-      flex: 1;
-      background: rgba(255, 255, 255, 0.9);
-      border-radius: 6px;
-      padding: 0.8rem 0.4rem;
-      text-align: center;
-      border: 1px solid rgba(0, 0, 0, 0.1);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      gap: 0.3rem;
-    }
-
-    .feature-icon {
-      font-size: 1rem;
-    }
-
-    .feature-text {
-      font-size: 0.65rem;
-      color: var(--text-primary);
-      font-weight: 600;
-      line-height: 1;
-    }
-
-    .project-info {
-      padding: 2rem;
-    }
-
-    .project-category {
-      color: var(--primary);
-      font-weight: 600;
-      font-size: 0.9rem;
-      margin-bottom: 0.5rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .project-title {
-      font-size: 1.5rem;
-      font-weight: 700;
-      margin-bottom: 1rem;
-      color: var(--text-primary);
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .founder-badge {
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      color: white;
-      font-size: 0.7rem;
-      padding: 0.25rem 0.75rem;
-      border-radius: 20px;
-      font-weight: 600;
-    }
-
-    .project-description {
-      color: var(--text-secondary);
-      line-height: 1.7;
-      margin-bottom: 1.5rem;
-    }
-
-    .project-tech {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .tech-tag {
-      background: var(--bg-secondary);
-      color: var(--text-secondary);
-      padding: 0.375rem 0.75rem;
-      border-radius: 20px;
-      font-size: 0.8rem;
-      font-weight: 500;
-      border: 1px solid var(--border);
-    }
-
-    .project-links {
-      display: flex;
-      gap: 1rem;
-    }
-
-    .project-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.75rem 1.5rem;
-      background: var(--bg-secondary);
-      color: var(--text-primary);
-      text-decoration: none;
-      border-radius: 50px;
-      font-weight: 600;
-      transition: all 0.3s ease;
-      border: 1px solid var(--border);
-    }
-
-    .project-link:hover {
-      background: var(--primary);
-      color: white;
-      transform: translateY(-2px);
-    }
-
-    .project-link.primary {
-      background: var(--primary);
-      color: white;
-      border-color: var(--primary);
-    }
-
-    .project-link.primary:hover {
-      background: var(--primary-dark);
-      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
-    }
-    .memolearning {
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      color: white;
-      border-radius: 30px;
-      padding: 4rem;
-      margin: 4rem 0;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .memolearning::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      right: -50%;
-      width: 100%;
-      height: 200%;
-      background: radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent 70%);
-      animation: rotate 20s linear infinite;
-    }
-
-    @keyframes rotate {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-
-    .memolearning-content {
-      position: relative;
-      z-index: 2;
-      text-align: center;
-    }
-
-    .memolearning-title {
-      font-size: 2.5rem;
-      font-weight: 900;
-      margin-bottom: 1.5rem;
-    }
-
-    .memolearning-description {
-      font-size: 1.2rem;
-      line-height: 1.8;
-      opacity: 0.9;
-      max-width: 800px;
-      margin: 0 auto;
-    }
-
-    /* Footer */
-    footer {
-      background: var(--bg-dark);
-      color: white;
-      padding: 4rem 2rem 2rem;
-      text-align: center;
-    }
-
-    .footer-content {
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    .footer-title {
-      font-size: 2rem;
-      font-weight: 800;
-      margin-bottom: 1rem;
-      color: var(--primary);
-    }
-
-    .footer-description {
-      font-size: 1.1rem;
-      color: var(--text-light);
-      margin-bottom: 2rem;
-    }
-
-    .contact-info {
-      display: flex;
-      justify-content: center;
-      gap: 2rem;
-      margin-bottom: 2rem;
-      flex-wrap: wrap;
-    }
-
-    .contact-item {
-      color: var(--text-light);
-      text-decoration: none;
-      transition: color 0.3s ease;
-    }
-
-    .contact-item:hover {
-      color: var(--primary);
-    }
-
-    .social-links {
-      display: flex;
-      justify-content: center;
-      gap: 1.5rem;
-      margin-bottom: 2rem;
-    }
-
-    .social-link {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 50px;
-      height: 50px;
-      background: rgba(99, 102, 241, 0.1);
-      color: var(--primary);
-      border-radius: 50%;
-      text-decoration: none;
-      transition: all 0.3s ease;
-    }
-
-    .social-link:hover {
-      background: var(--primary);
-      color: white;
-      transform: translateY(-3px);
-    }
-
-    .footer-bottom {
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      padding-top: 2rem;
-      color: var(--text-light);
-      font-size: 0.9rem;
-    }
-
-    /* Mobile Menu */
-    .mobile-menu {
-      display: none;
-      cursor: pointer;
-      font-size: 1.5rem;
-      color: var(--primary);
-    }
-
-    /* Responsive Design */
-    @media (max-width: 768px) {
-      .nav-links {
-        /* Mobile menu links should be hidden by default on mobile */
-        display: none;
-        flex-direction: column;
-        position: absolute;
-        top: 80px;
-        left: 0;
-        width: 100%;
-        background: rgba(255, 255, 255, 0.95);
-        border-top: 1px solid var(--border);
-        padding: 1rem 0;
-        box-shadow: 0 4px 20px var(--shadow);
-      }
-      
-      .nav-links.open {
-        display: flex;
-      }
-      
-      .nav-links li {
-        text-align: center;
-        padding: 0.5rem 0;
-      }
-
-      .mobile-menu {
-        display: block;
-      }
-
-      .hero-title {
-        font-size: 2.5rem;
-      }
-
-      .about-content {
-        grid-template-columns: 1fr;
-        gap: 2rem;
-      }
-
-      .about-stats {
-        grid-template-columns: 1fr;
-      }
-
-      .section-title {
-        font-size: 2rem;
-      }
-
-      .memolearning {
-        padding: 3rem 2rem;
-      }
-
-      .contact-info {
-        flex-direction: column;
-        gap: 1rem;
-      }
-
-      .hero-buttons {
-        flex-direction: column;
-        align-items: center;
-      }
-
-      .project-card {
-        margin-bottom: 2rem;
-      }
-
-      .project-browser {
-        transform: none;
-      }
-
-      .project-card:hover .project-browser {
-        transform: none;
-      }
-
-      .mock-features {
-        flex-direction: column;
-        gap: 0.5rem;
-      }
-
-      .project-title {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.5rem;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prayas Thapa - Digital Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for the clean, light portfolio layout (Rebirth Style) */
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;500;600;700;800&display=swap');
+        
+        body {
+            background-color: #ffffff;
+            color: #1f2937;
+            overflow-x: hidden;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+        }
+
+        /* --- Custom Typography (Rebirth Style) --- */
+        .serif-title {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+        }
+        .sans-text {
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+        }
+        
+        /* Nav Link Hover Effect (Rebirth Style) */
+        .nav-link {
+            transition: color 0.3s ease, border-bottom 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link:hover {
+            color: #000;
+            border-bottom: 2px solid #000; /* Subtle black underline */
+        }
+        
+        /* --- Card Styling (Skills & Services) --- */
+        .white-card {
+            background-color: #ffffff;
+            border-radius: 1rem; /* Slightly smaller rounded corners for clean look */
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.02);
+            transition: transform 0.3s ease;
+            border: 1px solid #f3f4f6; /* Subtle light border */
+        }
+        .white-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        /* --- General Layout & Typography --- */
+        .content-overlay {
+            position: relative;
+            z-index: 10;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        /* --- Line Wipe Divider (for separation) */
+        .line-wipe {
+            height: 1px;
+            background-color: #e5e7eb; /* Light gray divider */
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+            max-width: 90%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Hero Text Animation */
+        .line-container { display: block; overflow: hidden; }
+        .animated-line {
+            display: block;
+            transform: translateY(100%);
+            opacity: 0;
+            transition: transform 1s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.8s ease-out;
+        }
+        .line-is-visible .animated-line {
+            transform: translateY(0);
+            opacity: 1;
+            transition-delay: 0.1s;
+        }
+        
+        /* --- Preloader / Startup Screen CSS (Kept Dark) --- */
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #0d0c1d; /* Dark background retained for the preloader */
+            z-index: 1000; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 1.5s ease-out; 
+            opacity: 1;
+            flex-direction: column;
+        }
+
+        .preloader-hidden {
+            opacity: 0 !important;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        
+        /* Laughing Emoji Animation (Wander) */
+        .ninja-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            flex-direction: column;
+        }
+        #ninja-animation {
+            /* We remove the flex display here so the character can move independently */
+            display: block; 
+            width: 100%;
+            height: 100%;
+            position: absolute;
+        }
+
+        #ninja-character {
+            display: inline-block;
+            position: absolute;
+            /* Use a long, linear animation for 10 seconds */
+            animation: emoji-wander 10s linear forwards; 
+            filter: drop-shadow(0 0 15px rgba(255, 255, 0, 0.8)); 
+        }
+
+        /* Loading text position is adjusted to stay central */
+        #loading-text {
+            position: absolute;
+            bottom: 20%;
+        }
+        
+        /* Keyframes for erratic movement across the ENTIRE screen */
+        @keyframes emoji-wander { 
+            /* Start from center-ish, hidden at first */
+            0% { transform: translate(45vw, 45vh) scale(0.5) rotate(0deg); opacity: 0; }
+            5% { transform: translate(45vw, 45vh) scale(1) rotate(0deg); opacity: 1; }
+            /* Top Left Corner */
+            15% { transform: translate(5vw, 10vh) scale(1.2) rotate(45deg); }
+            /* Middle Right */
+            30% { transform: translate(80vw, 40vh) scale(0.9) rotate(-30deg); }
+            /* Bottom Center */
+            45% { transform: translate(40vw, 85vh) scale(1.1) rotate(10deg); }
+            /* Top Right Corner */
+            60% { transform: translate(85vw, 5vh) scale(1.3) rotate(90deg); }
+            /* Middle Left */
+            75% { transform: translate(10vw, 60vh) scale(1) rotate(-50deg); }
+            /* Center */
+            90% { transform: translate(45vw, 45vh) scale(1.1) rotate(20deg); opacity: 1; }
+            /* Exit stage right, scaled down */
+            100% { transform: translate(120vw, 120vh) scale(0.1) rotate(720deg); opacity: 0; }
+        }
+
+        /* Scroll Animations (kept) */
+        .fade-in-section {
+            opacity: 0;
+            transform: translateY(15px); 
+            transition: all 0.8s cubic-bezier(0.19, 1, 0.22, 1); 
+        }
+        
+        .is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Header animation for slide down */
+        .header-slide-down {
+            transform: translateY(-100%);
+            transition: transform 0.8s ease-out;
+        }
+        .header-visible {
+            transform: translateY(0);
+        }
+
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
 </head>
 <body>
-  <!-- CLI Game Introduction Screen -->
-  <div id="cli-game-intro">
-    <div class="scan-line-overlay"></div>
-    <div class="terminal-output" id="terminal-output">
-      <p style="color:var(--cli-primary)">--- P.T. SYSTEM 1.0.2 BOOT SEQUENCE ---</p>
-      <p></p>
-      <p style="color:#ffbd2e;">[WARN] Accessing Public Log. System Initialization Required.</p>
-      <p style="color:var(--secondary);">[INFO] Checking system integrity... OK</p>
-      <p style="color:var(--secondary);">[INFO] Loading core modules... Complete</p>
-      <p style="color:var(--secondary);">[INFO] Interface: 'Prayas Thapa | Web Developer & Founder' loaded.</p>
-      <p></p>
-      <p>SYSTEM READY.</p>
-      <p>To continue to the portfolio, type <span class="cli-success">RUN PORTFOLIO</span> and press Enter.</p>
-      <p><span class="cli-info">Available Commands: </span><span class="cli-success">RUN PORTFOLIO</span>, HELP, VERSION</p>
-      <!-- The instruction now inherits the default terminal green color -->
-      <p>(No, this isn't a glitch, literally just type in RUN PORTFOLIO)</p>
-      <p></p>
+
+    <!-- VIDEO GAME STARTUP PRELOADER (Z-INDEX 1000) -->
+    <div id="preloader">
+        <div class="ninja-container">
+            <div id="ninja-animation">
+                <!-- Laughing Character (Emoji) -->
+                <!-- We use viewport units (vw, vh) in the keyframes, so the size needs to be large -->
+                <span id="ninja-character" class="text-6xl md:text-9xl text-white">😂</span> 
+            </div>
+            <!-- Loading Text placed centrally below the animation container -->
+            <p id="loading-text" class="text-xl mt-4 tracking-widest text-gray-400">PRAYAS THAPA</p>
+        </div>
     </div>
-    <div class="terminal-input-line">
-      <span class="terminal-prompt">USER@PT-PORTFOLIO:~$</span>
-      <input type="text" id="terminal-input" autofocus autocomplete="off" />
-    </div>
-  </div>
+    <!-- End Preloader -->
 
-  <!-- Navigation (Needs to be outside the main content wrapper for z-index control) -->
-  <nav id="navbar" style="opacity: 0; pointer-events: none;">
-    <div class="nav-container">
-      <div class="logo">PT</div>
-      <ul class="nav-links" id="nav-links">
-        <li><a href="#home">Home</a></li>
-        <li><a href="#about">About</a></li>
-        <li><a href="#skills">Skills</a></li>
-        <li><a href="#services">Services</a></li>
-        <li><a href="#contact">Contact</a></a></li>
-      </ul>
-      <div class="mobile-menu" id="mobile-menu-btn">
-        <i class="fas fa-bars"></i>
-      </div>
-    </div>
-  </nav>
+    <!-- Main Content (Z-index 10) -->
+    <div class="content-overlay">
 
-  <!-- Main Portfolio Content (Initially hidden) -->
-  <div id="main-portfolio-content" style="opacity: 0; transition: opacity 1s ease-in-out;">
-    
-    <!-- Hero Section -->
-    <section id="home" class="hero">
-      <div class="hero-content">
-        <p class="hero-subtitle">👋 Hello, I'm</p>
-        <h1 class="hero-title">Prayas Thapa</h1>
-        <p class="hero-description">
-          Front-End Software Developer
-        </p>
-        <div class="hero-buttons">
-          <a href="#about" class="btn btn-primary">Discover My Work</a>
-          <a href="#contact" class="btn btn-secondary">Let's Connect</a>
-        </div>
-      </div>
-    </section>
+        <!-- Header / Navigation (Minimalist Header) -->
+        <header id="main-header" class="flex justify-between items-center py-6 px-4 md:px-12 border-b border-gray-100 header-slide-down">
+            <!-- Centered Logo/Title -->
+            <div class="flex-1 text-center">
+                <h1 class="text-2xl md:text-3xl text-gray-800 serif-title tracking-widest">
+                    PORTFOLIO
+                </h1>
+            </div>
 
-    <!-- About Section -->
-    <section id="about" class="section">
-      <div class="section-header">
-        <p class="section-subtitle">Get to know me</p>
-        <h2 class="section-title">About Me</h2>
-        <p class="section-description">
-          Passionate developer and entrepreneur with a mission to democratize education through technology.
-        </p>
-      </div>
-      <div class="about-content">
-        <div class="about-text">
-          <p>
-            I'm an aspiring electrical engineer and dedicated front-end developer with a passion for AI, technology, software, and systems. As the founder of <span class="highlight">Alvric Technologies LLC</span>, I build modern front-end and back-end solutions for local businesses, combining clean design with scalable software. Turning my clients visions into reality. I also am in-current development on <span class="highlight">MemoLearning</span> which is an innovative, interactive and AI-powered STEM learning platform designed to make learning both intuitive and accessible to every single student.
-          </p>
-          <br>
-          <p>
-            I focus on creating technology that is intuitive, impactful, and accessible. My goal is to design systems that empower people, whether through business software or innovative learning platforms and communities.
-          </p>
-        </div>
-        <div class="about-stats">
-          <div class="stat-card">
-            <div class="stat-number">7+</div>
-            <div class="stat-label">Programming Languages</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-number">1</div>
-            <div class="stat-label">Startup Founded</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-number">100%</div>
-            <div class="stat-label">Passion Driven</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-number">∞</div>
-            <div class="stat-label">Learning Never Stops</div>
-          </div>
-        </div>
-      </div>
-    </section>
+            <!-- Minimalist Navigation -->
+            <nav class="space-x-4 md:space-x-8 text-sm md:text-base absolute right-4 md:static md:right-auto">
+                <a href="#" class="nav-link text-gray-600 hover:text-black">Home</a>
+                <a href="#about" class="nav-link text-gray-600 hover:text-black">About</a>
+                <a href="#skills" class="nav-link text-gray-600 hover:text-black">Skills</a>
+                <a href="#services" class="nav-link text-gray-600 hover:text-black">Services</a>
+                <a href="#contact" class="nav-link text-gray-600 hover:text-black">Contact</a>
+            </nav>
+        </header>
 
-    <!-- Skills Section -->
-    <section id="skills" class="section">
-      <div class="section-header">
-        <p class="section-subtitle">My expertise</p>
-        <h2 class="section-title">Technical Skills</h2>
-        <p class="section-description">
-          A comprehensive toolkit spanning multiple disciplines and technologies.
-        </p>
-      </div>
-      <div class="skills-grid">
-        <div class="skill-category">
-          <div class="skill-icon">
-            <i class="fas fa-code"></i>
-          </div>
-          <h3 class="skill-title">Programming Languages</h3>
-          <ul class="skill-list">
-            <li>Python</li>
-            <li>JavaScript</li>
-            <li>HTML5 & CSS3</li>
-            <li>SQL</li>
-            <li>Java</li>
-            <li>Lua</li>
-          </ul>
-        </div>
-        <div class="skill-category">
-          <div class="skill-icon">
-            <i class="fas fa-tools"></i>
-          </div>
-          <h3 class="skill-title">Frameworks & Tools</h3>
-          <ul class="skill-list">
-            <li>Git & Version Control</li>
-            <li>VS Code</li>
-            <li>Bootstrap</li>
-            <li>Modern Web Development</li>
-          </ul>
-        </div>
-        <div class="skill-category">
-          <div class="skill-icon">
-            <i class="fas fa-chart-line"></i>
-          </div>
-          <h3 class="skill-title">Domains</h3>
-          <ul class="skill-list">
-            <li>Data Science</li>
-            <li>Mathematics</li>
-            <li>Finance</li>
-            <li>Computer Science</li>
-            <li>Educational Technology</li>
-          </ul>
-        </div>
-        <div class="skill-category">
-          <div class="skill-icon">
-            <i class="fas fa-lightbulb"></i>
-          </div>
-          <h3 class="skill-title">Core Strengths</h3>
-          <ul class="skill-list">
-            <li>Critical Thinking</li>
-            <li>Problem Solving</li>
-            <li>Team Leadership</li>
-            <li>Innovation</li>
-            <li>Analytical Mindset</li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-
-    <!-- Services Section -->
-    <section id="services" class="section">
-      <div class="section-header">
-        <p class="section-subtitle">What I offer</p>
-        <h2 class="section-title">Services</h2>
-        <p class="section-description">
-          Comprehensive solutions for your digital and educational needs.
-        </p>
-      </div>
-      <div class="services-grid">
-        <div class="service-card">
-          <div class="service-icon">
-            <i class="fas fa-laptop-code"></i>
-          </div>
-          <h3 class="service-title">Custom Website Development</h3>
-          <p class="service-description">
-            Tailored, fast, and responsive websites using modern HTML, CSS, and JavaScript practices.  
-            Built with performance, accessibility, and user experience in mind.
-          </p>
-        </div>
-        <div class="service-card">
-          <div class="service-icon">
-            <i class="fas fa-rocket"></i>
-          </div>
-          <h3 class="service-title">Technical Consulting</h3>
-          <p class="service-description">
-            Partnering with startups and businesses to bring digital ideas to life through scalable,  
-            maintainable code. From concept to deployment.
-          </p>
-        </div>
-        <div class="service-card">
-          <div class="service-icon">
-            <i class="fas fa-paint-brush"></i>
-          </div>
-          <h3 class="service-title">Frontend Architecture</h3>
-          <p class="service-description">
-            Optimized web structures with clean UI design and performance-focused development.  
-            Creating interfaces that users love.
-          </p>
-        </div>
-        <div class="service-card">
-          <div class="service-icon">
-            <i class="fas fa-graduation-cap"></i>
-          </div>
-          <h3 class="service-title">Math & CS Tutoring</h3>
-          <p class="service-description">
-            High school tutoring in mathematics and computer science.
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <!-- MemoLearning Section -->
-    <section class="section">
-      <div class="memolearning">
-        <div class="memolearning-content">
-          <h2 class="memolearning-title">🚀 MemoLearning Mission</h2>
-          <p class="memolearning-description">
-            MemoLearning is my personal mission to democratize access to high-quality education in mathematics,  
-            finance, computer science, and beyond. The goal is to provide a modern, engaging, and free learning  
-            experience for students and self-learners worldwide. By integrating practical problem-solving,  
-            data literacy, and foundational theory, MemoLearning empowers the next generation of thinkers,  
-            creators, and innovator. Regardless of where they begin.
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <!-- Footer -->
-    <footer id="contact">
-      <div class="footer-content">
-        <h2 class="footer-title">Let's Work Together</h2>
-        <p class="footer-description">
-          Ready to bring your ideas to life? Let's create something amazing together.
-        </p>
-        <div class="contact-info">
-          <a href="mailto:prayasthapa0522@gmail.com" class="contact-item">
-            <i class="fas fa-envelope"></i> prayasthapa0522@gmail.com
-          </a>
-          <a href="tel:401-489-9230" class="contact-item">
-            <i class="fas fa-phone"></i> 401-489-9230
-          </a>
-        </div>
-        <div class="social-links">
-          <a href="https://www.linkedin.com/in/prayasthapa22/" class="social-link" target="_blank">
-            <i class="fab fa-linkedin"></i>
-          </a>
-          <a href="mailto:prayasthapa0522@gmail.com" class="social-link">
-            <i class="fas fa-envelope"></i>
-          </a>
-        </div>
-        <div class="footer-bottom">
-          <p>&copy; 2025 Prayas Thapa. All rights reserved.</p>
-        </div>
-      </div>
-    </footer>
-  </div>
-
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const cliIntro = document.getElementById('cli-game-intro');
-        const terminalOutput = document.getElementById('terminal-output');
-        const terminalInput = document.getElementById('terminal-input');
-        const mainContent = document.getElementById('main-portfolio-content');
-        const navbar = document.getElementById('navbar');
-        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-        const navLinks = document.getElementById('nav-links');
-        
-        // Focus the input field immediately and set up a focus loop
-        terminalInput.focus();
-
-        function keepFocus() {
-            if (cliIntro && cliIntro.style.opacity === '1') {
-                terminalInput.focus();
-            }
-        }
-        // Keep checking focus every second to prevent loss of focus in the iframe environment
-        const focusInterval = setInterval(keepFocus, 1000); 
-
-        const COMMAND_MAP = {
-            'RUN PORTFOLIO': loadPortfolio,
-            'HELP': showHelp,
-            'VERSION': showVersion,
-        };
-
-        const MAX_HISTORY = 30;
-        
-        /**
-         * Appends text to the terminal output area.
-         * @param {string} text - The content to append.
-         * @param {string} className - Optional class for styling (e.g., 'cli-error').
-         */
-        function appendOutput(text, className = '') {
-            const p = document.createElement('p');
-            p.innerHTML = text;
-            if (className) p.classList.add(className);
-            terminalOutput.appendChild(p);
-
-            // Keep only the last N lines
-            while (terminalOutput.children.length > MAX_HISTORY) {
-                terminalOutput.removeChild(terminalOutput.firstChild);
-            }
-
-            // Scroll to the bottom
-            cliIntro.scrollTop = cliIntro.scrollHeight;
-        }
-
-        /**
-         * Clears the input field and handles the command execution.
-         */
-        function handleInput(event) {
-            if (event.key === 'Enter') {
-                const command = terminalInput.value.trim().toUpperCase();
-                
-                // Echo the command first
-                appendOutput(`<span class="terminal-prompt">USER@PT-PORTFOLIO:~$</span> ${terminalInput.value}`);
-                
-                // Clear the input
-                terminalInput.value = '';
-
-                const action = COMMAND_MAP[command];
-                if (action) {
-                    action();
-                } else if (command === '') {
-                    // Do nothing for empty input
-                } else {
-                    appendOutput(`[ERROR] Unknown command: ${command}. Type <span class="cli-success">HELP</span> for a list of commands.`, 'cli-error');
-                }
-            }
-        }
-
-        /**
-         * Function to load and display the main portfolio content.
-         */
-        function loadPortfolio() {
-            appendOutput('<span class="cli-success">[SUCCESS] EXECUTE PORTFOLIO...</span>');
-            appendOutput('[INFO] Shutting down CLI interface. Standby...');
+        <!-- Hero Section (Clean/Minimalist Look) -->
+        <section id="hero-text" class="min-h-[50vh] flex flex-col justify-center items-center py-20 px-4 md:px-8 bg-gray-50/50">
+            <h2 class="serif-title text-5xl md:text-7xl lg:text-8xl tracking-tight leading-snug max-w-5xl text-center line-is-visible text-gray-800">
+                <!-- Staggered lines for dramatic entrance -->
+                <div class="line-container">
+                    <span class="animated-line">PRAYAS THAPA</span>
+                </div>
+            </h2>
             
-            terminalInput.disabled = true;
-            clearInterval(focusInterval); // Stop the focus loop
+            <p class="text-xl sm:text-2xl font-light text-gray-700 mt-8 mb-10 fade-in-section" data-delay="0.3">
+                Full-Stack Software Developer
+            </p>
+
+            <!-- Buttons adapted to minimalist style -->
+            <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6">
+                <a href="#about" class="py-3 px-8 text-base font-semibold text-white bg-black hover:bg-gray-800 transition duration-300 rounded-lg shadow-lg fade-in-section" data-delay="0.5">
+                    Learn More About Me
+                </a>
+            </div>
+        </section>
+        
+        <!-- Line Separator -->
+        <div class="line-wipe"></div>
+
+
+        <!-- About Me Section (Content from Images, Rebirth Style) -->
+        <section id="about" class="py-20 px-4 md:px-12 bg-white">
+            <div class="max-w-6xl mx-auto">
+                <h4 class="text-sm font-medium text-gray-500 text-center uppercase mb-1 fade-in-section" data-delay="0.05">Who I Am</h4>
+                <h3 class="serif-title text-4xl font-extrabold text-gray-800 text-center mb-12 fade-in-section" data-delay="0.15">About Me</h3>
+                
+                <p class="text-center text-lg text-gray-600 mb-12 max-w-3xl mx-auto fade-in-section" data-delay="0.25">
+                    Passionate developer and entrepreneur with a mission to democratize education through technology.
+                </p>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                    <!-- Left Column: Detailed Bio (Content from images) -->
+                    <div class="text-gray-700 leading-relaxed fade-in-section" data-delay="0.35">
+                        <p class="mb-4">
+                            I'm an aspiring electrical engineer and dedicated full-stack developer with a passion for AI, technology, software, and systems. As the founder of Alvric Technologies LLC, I build modern front-end and back-end solutions for local businesses, combining clean design with scalable software. Turning my clients' visions into reality.
+                        </p>
+                        <p class="mb-4">
+                            I also am in-current development on MemoLearning which is an innovative, interactive and AI-powered STEM learning platform designed to make learning both intuitive and accessible to every single student.
+                        </p>
+                        <p>
+                            I focus on creating technology that is intuitive, impactful, and accessible. My goal is to design systems that empower people, whether through business software or innovative learning platforms and communities.
+                        </p>
+                    </div>
+
+                    <!-- Right Column: Stats Boxes (Content from images) -->
+                    <div class="grid grid-cols-2 gap-6">
+                        <!-- Stat 1: 7+ -->
+                        <div class="white-card text-center !p-6 fade-in-section" data-delay="0.45">
+                            <p class="text-4xl font-bold text-gray-800">7+</p>
+                            <p class="text-gray-600 mt-1">Programming Languages</p>
+                        </div>
+                        <!-- Stat 2: 1 -->
+                        <div class="white-card text-center !p-6 fade-in-section" data-delay="0.55">
+                            <p class="text-4xl font-bold text-gray-800">1</p>
+                            <p class="text-gray-600 mt-1">Startup Founded</p>
+                        </div>
+                        <!-- Stat 3: 100% -->
+                        <div class="white-card text-center !p-6 fade-in-section" data-delay="0.65">
+                            <p class="text-4xl font-bold text-gray-800">100%</p>
+                            <p class="text-gray-600 mt-1">Passion Driven</p>
+                        </div>
+                        <!-- Stat 4: Infinity -->
+                        <div class="white-card text-center !p-6 fade-in-section" data-delay="0.75">
+                            <p class="text-4xl font-bold text-gray-800">&infin;</p>
+                            <p class="text-600 mt-1">Learning Never Stops</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Line Separator -->
+        <div class="line-wipe"></div>
+
+        <!-- Technical Skills Section (Content from Images, Rebirth Style) -->
+        <section id="skills" class="py-20 px-4 md:px-12 bg-gray-50/50">
+            <div class="max-w-6xl mx-auto">
+                <h4 class="text-sm font-medium text-gray-500 text-center uppercase mb-1 fade-in-section" data-delay="0.05">My expertise</h4>
+                <h3 class="serif-title text-4xl font-extrabold text-gray-800 text-center mb-4 fade-in-section" data-delay="0.15">Technical Skills</h3>
+                <p class="text-center text-gray-600 mb-12 fade-in-section" data-delay="0.25">
+                    A comprehensive toolkit spanning multiple disciplines and technologies.
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    
+                    <!-- Column 1: Programming Languages -->
+                    <div class="white-card fade-in-section" data-delay="0.35">
+                        <div class="text-3xl text-gray-600 mb-4">💻</div>
+                        <h4 class="text-xl font-bold text-gray-800 mb-6 sans-text">Programming Languages</h4>
+                        <ul class="space-y-3 text-gray-700">
+                            <li class="flex items-center">→ <span class="ml-2">Python</span></li>
+                            <li class="flex items-center">→ <span class="ml-2">JavaScript</span></li>
+                            <li class="flex items-center">→ <span class="ml-2">HTML5 & CSS3</span></li>
+                            <li class="flex items-center">→ <span class="ml-2">SQL</span></li>
+                            <li class="flex items-center">→ <span class="ml-2">Java</span></li>
+                            <li class="flex items-center">→ <span class="ml-2">Lua</span></li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Column 2: Frameworks & Tools -->
+                    <div class="white-card fade-in-section" data-delay="0.45">
+                        <div class="text-3xl text-gray-600 mb-4">🛠️</div>
+                        <h4 class="text-xl font-bold text-gray-800 mb-6 sans-text">Frameworks & Tools</h4>
+                        <ul class="space-y-3 text-gray-700">
+                            <li class="flex items-center">→ <span class="ml-2">Git & Version Control</span></li>
+                            <li class="flex items-center">→ <span class="ml-2">VS Code</span></li>
+                            <li class="flex items-center">→ <span class="ml-2">Bootstrap</span></li>
+                            <li class="flex items-center">→ <span class="ml-2">Modern Web Development</span></li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 3: Domains -->
+                    <div class="white-card fade-in-section" data-delay="0.55">
+                        <div class="text-3xl text-gray-600 mb-4">📈</div>
+                        <h4 class="text-xl font-bold text-gray-800 mb-6 sans-text">Domains</h4>
+                        <ul class="space-y-3 text-gray-700">
+                            <li class="flex items-center">→ <span class="ml-2">Data Science</span></li>
+                            <li class="flex items-center">→ <span class="ml-2">Mathematics</span></li>
+                            <li class="flex items-center">→ <span class="ml-2">Finance</span></li>
+                            <li class="flex items-center">→ <span class="ml-2">Computer Science</span></li>
+                            <li class="flex items-center">→ <span class="ml-2">Educational Technology</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Line Separator -->
+        <div class="line-wipe"></div>
+
+
+        <!-- Services Section (Content from Images, Rebirth Style) -->
+        <section id="services" class="py-20 px-4 md:px-12 bg-white">
+            <div class="max-w-6xl mx-auto">
+                <h4 class="text-sm font-medium text-gray-500 text-center uppercase mb-1 fade-in-section" data-delay="0.05">What I offer</h4>
+                <h3 class="serif-title text-4xl font-extrabold text-gray-800 text-center mb-4 fade-in-section" data-delay="0.15">Services</h3>
+                <p class="text-center text-gray-600 mb-12 fade-in-section" data-delay="0.25">
+                    Comprehensive solutions for your digital and educational needs.
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    
+                    <!-- Service 1: Custom Website Development -->
+                    <div class="white-card fade-in-section" data-delay="0.35">
+                        <div class="text-4xl text-gray-600 mb-4">💻</div>
+                        <h4 class="text-xl font-bold text-gray-800 mb-3 sans-text">Custom Website Development</h4>
+                        <p class="text-sm text-gray-600">
+                            Tailored, fast, and responsive websites using modern HTML, CSS, and JavaScript practices. Built with performance, accessibility, and user experience in mind.
+                        </p>
+                    </div>
+
+                    <!-- Service 2: Technical Consulting -->
+                    <div class="white-card fade-in-section" data-delay="0.45">
+                        <div class="text-4xl text-gray-600 mb-4">🚀</div>
+                        <h4 class="text-xl font-bold text-gray-800 mb-3 sans-text">Technical Consulting</h4>
+                        <p class="text-sm text-gray-600">
+                            Partnering with startups and businesses to bring digital ideas to life through scalable, maintainable code. From concept to deployment.
+                        </p>
+                    </div>
+
+                    <!-- Service 3: Frontend Architecture -->
+                    <div class="white-card fade-in-section" data-delay="0.55">
+                        <div class="text-4xl text-gray-600 mb-4">🖌️</div>
+                        <h4 class="text-xl font-bold text-gray-800 mb-3 sans-text">Frontend Architecture</h4>
+                        <p class="text-sm text-gray-600">
+                            Optimized web structures with clean UI design and performance-focused development. Creating interfaces that users love.
+                        </p>
+                    </div>
+                    
+                    <!-- Service 4: Math & CS Tutoring -->
+                    <div class="white-card fade-in-section" data-delay="0.65">
+                        <div class="text-4xl text-gray-600 mb-4">🎓</div>
+                        <h4 class="text-xl font-bold text-gray-800 mb-3 sans-text">Math & CS Tutoring</h4>
+                        <p class="text-sm text-gray-600">
+                            High school tutoring in mathematics and computer science.
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Line Separator -->
+        <div class="line-wipe"></div>
+
+
+        <!-- Contact Section -->
+        <section id="contact" class="py-20 px-4 md:px-8 flex flex-col items-center text-center fade-in-section bg-white" data-delay="0.15">
+            <h3 class="serif-title text-4xl md:text-5xl font-extrabold mb-4 text-gray-800">LET'S CONNECT</h3>
+            
+            <p class="text-lg md:text-xl max-w-xl leading-snug text-gray-600 mb-8">
+                I'm always open to new challenges and collaborative projects. Let's build something amazing together.
+            </p>
+
+            <a href="mailto:prayas.thapa@example.com" 
+               class="mt-4 py-3 px-8 text-base font-bold text-white bg-black hover:bg-gray-800 transition duration-300 rounded-lg shadow-md">
+                SEND AN EMAIL
+            </a>
+        </section>
+
+        <!-- Footer -->
+        <footer class="py-12 px-4 md:px-8 text-center text-gray-500 text-sm border-t border-gray-100">
+            <p>&copy; 2025 Prayas Thapa. Digital Creator Portfolio. All Rights Reserved.</p>
+        </footer>
+    </div>
+    
+    <!-- JavaScript for Scroll Animations and Preloader -->
+    <script>
+        // --- SCROLL ANIMATION LOGIC ---
+        
+        /**
+         * Sets up the Intersection Observer to handle scroll-based animations.
+         */
+        function setupScrollAnimations() {
+            const observerOptions = {
+                root: null, 
+                rootMargin: '0px',
+                threshold: 0.1
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const target = entry.target;
+                        
+                        // Handle Staggered Fade-In
+                        if (target.classList.contains('fade-in-section')) {
+                            const delay = target.getAttribute('data-delay') || '0'; 
+                            target.style.transitionDelay = `${delay}s`;
+                            target.classList.add('is-visible');
+                            // Only unobserve sections, not repetitive items if needed later
+                            if (target.id) {
+                                observer.unobserve(target);
+                            }
+                        }
+                    }
+                });
+            }, observerOptions);
+
+            const animatedElements = document.querySelectorAll('.fade-in-section');
+            animatedElements.forEach(element => {
+                observer.observe(element);
+            });
+        }
+
+        /**
+         * Handles the initial preloader screen sequence, hiding it after a delay.
+         */
+        function handlePreloader() {
+            const preloader = document.getElementById('preloader');
+            const ninjaCharacter = document.getElementById('ninja-character');
+            if (!preloader || !ninjaCharacter) return;
+
+            // Duration is set to 10 seconds as requested
+            const preloaderDuration = 10000; 
 
             setTimeout(() => {
-                // 1. Hide the CLI
-                cliIntro.style.opacity = '0';
-                
-                // 2. Show the main content and navbar
-                mainContent.style.opacity = '1';
-                navbar.style.opacity = '1';
-                navbar.style.pointerEvents = 'auto';
+                // 1. Start the fade out transition (1.5s)
+                preloader.classList.add('preloader-hidden');
 
-                // 3. Remove the CLI element after transition
+                // 2. Wait for the transition to finish (1.5s)
                 setTimeout(() => {
-                    cliIntro.remove();
-                    // Ensure body can scroll again
-                    document.body.style.overflowY = 'auto';
-                }, 1000); 
-
-            }, 1000);
-        }
-        
-        /**
-         * Function to display available commands.
-         */
-        function showHelp() {
-            appendOutput('');
-            appendOutput('<span style="color:var(--cli-primary);">--- HELP MENU ---</span>');
-            appendOutput(`- <span class="cli-success">RUN PORTFOLIO</span>: Executes the main portfolio interface.`);
-            appendOutput(`- <span class="cli-info">HELP</span>: Displays this command list.`);
-            appendOutput(`- <span class="cli-info">VERSION</span>: Displays the system version.`);
-            appendOutput('');
+                    // Completely remove it from the flow
+                    preloader.style.display = 'none';
+                    
+                    // Trigger header and hero animations after preloader is gone
+                    animateHeader();
+                    document.querySelector('#hero-text h2').classList.add('line-is-visible');
+                }, 1500); 
+            }, preloaderDuration); 
         }
 
         /**
-         * Function to show version info.
+         * Animates the main header to slide down on initial load.
          */
-        function showVersion() {
-            appendOutput(`[INFO] Prayas Thapa Portfolio System: <span class="cli-success">v1.0.2</span> (2025-05-22 Build)`);
-        }
-
-        // Attach event listener to the input field
-        terminalInput.addEventListener('keydown', handleInput);
-
-        // Prevent body scrolling while CLI is active
-        document.body.style.overflowY = 'hidden';
-
-        // ------------------------------------------------------------------
-        // EXISTING PORTFOLIO JS (Updated to run after CLI is dismissed)
-        // ------------------------------------------------------------------
-
-        // Mobile menu functionality (basic implementation)
-        mobileMenuBtn.addEventListener('click', function() {
-            navLinks.classList.toggle('open');
-        });
-        
-        // Hide mobile menu when a link is clicked
-        navLinks.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', () => {
-                navLinks.classList.remove('open');
-            });
-        });
-
-        // Navbar scroll effect
-        window.addEventListener('scroll', function() {
-            const navbar = document.getElementById('navbar');
-            if (navbar && window.scrollY > 50) {
-                navbar.classList.add('scrolled');
-            } else if (navbar) {
-                navbar.classList.remove('scrolled');
-            }
-        });
-
-        // Smooth scrolling for navigation links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
+        function animateHeader() {
+            const header = document.getElementById('main-header');
+            setTimeout(() => {
+                if (header) {
+                    // The header-slide-down transition is already in the CSS.
+                    header.classList.add('header-visible'); 
                 }
-            });
-        });
-
-        // Intersection Observer for animations
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
+            }, 50); 
+        }
+        
+        // Start all initialization functions when the window loads
+        window.onload = function() {
+            setupScrollAnimations();
+            handlePreloader();
         };
 
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                // Only animate if the main content is visible (CLI is gone)
-                if (mainContent && mainContent.style.opacity === '1' && entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
-                }
-            });
-        }, observerOptions);
-
-        // Observe elements for scroll animations
-        document.querySelectorAll('.skill-category, .service-card, .stat-card, .project-card').forEach(el => {
-            el.style.opacity = '0';
-            el.style.transform = 'translateY(30px)';
-            el.style.transition = 'all 0.6s ease-out';
-            observer.observe(el);
-        });
-
-        // Add hover effects to buttons
-        document.querySelectorAll('.btn').forEach(btn => {
-            btn.addEventListener('mouseenter', function() {
-                this.style.transform = 'translateY(-2px)';
-            });
-            
-            btn.addEventListener('mouseleave', function() {
-                this.style.transform = 'translateY(0)';
-            });
-        });
-
-        // Parallax effect for hero section
-        window.addEventListener('scroll', () => {
-            const scrolled = window.pageYOffset;
-            const hero = document.querySelector('.hero');
-            // Only apply parallax if the CLI is dismissed and the hero element exists
-            if (cliIntro.style.opacity === '0' && hero) {
-                hero.style.transform = `translateY(${scrolled * 0.5}px)`;
-            }
-        });
-
-        // Add loading animation
-        window.addEventListener('load', function() {
-            // Note: We don't change body opacity here, the CLI handles the intro.
-        });
-    });
-  </script>
+    </script>
 </body>
 </html>
