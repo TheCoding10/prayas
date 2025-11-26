@@ -71,7 +71,7 @@
             margin-right: auto;
         }
 
-        /* Hero Text Animation */
+        /* --- Hero Text Animation (Staggered Line Reveal) --- */
         .line-container { display: block; overflow: hidden; }
         .animated-line {
             display: block;
@@ -84,8 +84,23 @@
             opacity: 1;
             transition-delay: 0.1s;
         }
+
+        /* --- Typing Animation Cursor (New!) --- */
+        .typing-cursor {
+            display: inline-block;
+            width: 3px; /* Thin cursor line */
+            height: 1.2em; /* Match text line height */
+            background-color: #1f2937; /* Dark text color */
+            margin-left: 0.1em;
+            vertical-align: middle;
+            animation: blink 0.7s step-end infinite;
+        }
+        @keyframes blink {
+            from, to { opacity: 0; }
+            50% { opacity: 1; }
+        }
         
-        /* --- Preloader / Startup Screen CSS (Kept Dark) --- */
+        /* --- Preloader / Startup Screen CSS --- */
         #preloader {
             position: fixed;
             top: 0;
@@ -119,7 +134,6 @@
             flex-direction: column;
         }
         #ninja-animation {
-            /* We remove the flex display here so the character can move independently */
             display: block; 
             width: 100%;
             height: 100%;
@@ -129,48 +143,38 @@
         #ninja-character {
             display: inline-block;
             position: absolute;
-            /* Use a long, linear animation for 10 seconds */
             animation: emoji-wander 10s linear forwards; 
             filter: drop-shadow(0 0 15px rgba(255, 255, 0, 0.8)); 
         }
 
-        /* Loading text position is adjusted to stay central */
         #loading-text {
             position: absolute;
             bottom: 20%;
         }
         
-        /* Keyframes for erratic movement across the ENTIRE screen */
         @keyframes emoji-wander { 
-            /* Start from center-ish, hidden at first */
             0% { transform: translate(45vw, 45vh) scale(0.5) rotate(0deg); opacity: 0; }
             5% { transform: translate(45vw, 45vh) scale(1) rotate(0deg); opacity: 1; }
-            /* Top Left Corner */
             15% { transform: translate(5vw, 10vh) scale(1.2) rotate(45deg); }
-            /* Middle Right */
             30% { transform: translate(80vw, 40vh) scale(0.9) rotate(-30deg); }
-            /* Bottom Center */
             45% { transform: translate(40vw, 85vh) scale(1.1) rotate(10deg); }
-            /* Top Right Corner */
             60% { transform: translate(85vw, 5vh) scale(1.3) rotate(90deg); }
-            /* Middle Left */
             75% { transform: translate(10vw, 60vh) scale(1) rotate(-50deg); }
-            /* Center */
             90% { transform: translate(45vw, 45vh) scale(1.1) rotate(20deg); opacity: 1; }
-            /* Exit stage right, scaled down */
             100% { transform: translate(120vw, 120vh) scale(0.1) rotate(720deg); opacity: 0; }
         }
 
-        /* Scroll Animations (kept) */
+        /* --- ENHANCED Scroll Animations (Smoother, Cluely-style lift) --- */
         .fade-in-section {
             opacity: 0;
-            transform: translateY(15px); 
-            transition: all 0.8s cubic-bezier(0.19, 1, 0.22, 1); 
+            /* Start slightly below and scaled down for a subtle 'lift' effect */
+            transform: translateY(20px) scale(0.98); 
+            transition: all 1.2s cubic-bezier(0.25, 1, 0.5, 1); /* Slower, smoother transition */
         }
         
         .is-visible {
             opacity: 1;
-            transform: translateY(0);
+            transform: translateY(0) scale(1);
         }
         
         /* Header animation for slide down */
@@ -202,11 +206,8 @@
     <div id="preloader">
         <div class="ninja-container">
             <div id="ninja-animation">
-                <!-- Laughing Character (Emoji) -->
-                <!-- We use viewport units (vw, vh) in the keyframes, so the size needs to be large -->
                 <span id="ninja-character" class="text-6xl md:text-9xl text-white">😂</span> 
             </div>
-            <!-- Loading Text placed centrally below the animation container -->
             <p id="loading-text" class="text-xl mt-4 tracking-widest text-gray-400">PRAYAS THAPA</p>
         </div>
     </div>
@@ -217,16 +218,15 @@
 
         <!-- Header / Navigation (Minimalist Header) -->
         <header id="main-header" class="flex justify-between items-center py-6 px-4 md:px-12 border-b border-gray-100 header-slide-down">
-            <!-- Centered Logo/Title -->
+            <!-- Centered Logo/Title - Removed "Portfolio" text -->
             <div class="flex-1 text-center">
                 <h1 class="text-2xl md:text-3xl text-gray-800 serif-title tracking-widest">
-                    PORTFOLIO
+                    <!-- Title removed per request -->
                 </h1>
             </div>
 
-            <!-- Minimalist Navigation -->
+            <!-- Minimalist Navigation - Removed "Home" link -->
             <nav class="space-x-4 md:space-x-8 text-sm md:text-base absolute right-4 md:static md:right-auto">
-                <a href="#" class="nav-link text-gray-600 hover:text-black">Home</a>
                 <a href="#about" class="nav-link text-gray-600 hover:text-black">About</a>
                 <a href="#skills" class="nav-link text-gray-600 hover:text-black">Skills</a>
                 <a href="#services" class="nav-link text-gray-600 hover:text-black">Services</a>
@@ -243,13 +243,13 @@
                 </div>
             </h2>
             
-            <p class="text-xl sm:text-2xl font-light text-gray-700 mt-8 mb-10 fade-in-section" data-delay="0.3">
-                Full-Stack Software Developer
+            <!-- Subtitle for Typing Animation -->
+            <p id="hero-subtitle" class="text-xl sm:text-2xl font-light text-gray-700 mt-8 mb-10 min-h-[1.5em]" data-text="Full-Stack Software Developer">
             </p>
 
             <!-- Buttons adapted to minimalist style -->
-            <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6">
-                <a href="#about" class="py-3 px-8 text-base font-semibold text-white bg-black hover:bg-gray-800 transition duration-300 rounded-lg shadow-lg fade-in-section" data-delay="0.5">
+            <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6 fade-in-section" data-delay="0.5">
+                <a href="#about" class="py-3 px-8 text-base font-semibold text-white bg-black hover:bg-gray-800 transition duration-300 rounded-lg shadow-lg">
                     Learn More About Me
                 </a>
             </div>
@@ -283,27 +283,27 @@
                         </p>
                     </div>
 
-                    <!-- Right Column: Stats Boxes (Content from images) -->
+                    <!-- Right Column: Stats Boxes (Content from images) - Staggered reveal for cards -->
                     <div class="grid grid-cols-2 gap-6">
                         <!-- Stat 1: 7+ -->
-                        <div class="white-card text-center !p-6 fade-in-section" data-delay="0.45">
-                            <p class="text-4xl font-bold text-gray-800">7+</p>
-                            <p class="text-gray-600 mt-1">Programming Languages</p>
+                        <div class="white-card !p-6 fade-in-section" data-delay="0.45">
+                            <p class="text-4xl font-bold text-gray-800 text-center">7+</p>
+                            <p class="text-gray-600 mt-1 text-center">Programming Languages</p>
                         </div>
                         <!-- Stat 2: 1 -->
-                        <div class="white-card text-center !p-6 fade-in-section" data-delay="0.55">
-                            <p class="text-4xl font-bold text-gray-800">1</p>
-                            <p class="text-gray-600 mt-1">Startup Founded</p>
+                        <div class="white-card !p-6 fade-in-section" data-delay="0.55">
+                            <p class="text-4xl font-bold text-gray-800 text-center">1</p>
+                            <p class="text-gray-600 mt-1 text-center">Startup Founded</p>
                         </div>
                         <!-- Stat 3: 100% -->
-                        <div class="white-card text-center !p-6 fade-in-section" data-delay="0.65">
-                            <p class="text-4xl font-bold text-gray-800">100%</p>
-                            <p class="text-gray-600 mt-1">Passion Driven</p>
+                        <div class="white-card !p-6 fade-in-section" data-delay="0.65">
+                            <p class="text-4xl font-bold text-gray-800 text-center">100%</p>
+                            <p class="text-gray-600 mt-1 text-center">Passion Driven</p>
                         </div>
                         <!-- Stat 4: Infinity -->
-                        <div class="white-card text-center !p-6 fade-in-section" data-delay="0.75">
-                            <p class="text-4xl font-bold text-gray-800">&infin;</p>
-                            <p class="text-600 mt-1">Learning Never Stops</p>
+                        <div class="white-card !p-6 fade-in-section" data-delay="0.75">
+                            <p class="text-4xl font-bold text-gray-800 text-center">&infin;</p>
+                            <p class="text-600 mt-1 text-center">Learning Never Stops</p>
                         </div>
                     </div>
                 </div>
@@ -445,7 +445,7 @@
         </footer>
     </div>
     
-    <!-- JavaScript for Scroll Animations and Preloader -->
+    <!-- JavaScript for Scroll Animations, Preloader, and Typing Effect -->
     <script>
         // --- SCROLL ANIMATION LOGIC ---
         
@@ -469,10 +469,9 @@
                             const delay = target.getAttribute('data-delay') || '0'; 
                             target.style.transitionDelay = `${delay}s`;
                             target.classList.add('is-visible');
-                            // Only unobserve sections, not repetitive items if needed later
-                            if (target.id) {
-                                observer.unobserve(target);
-                            }
+                            
+                            // Unobserve once visible, to prevent re-triggering on scroll up/down
+                            observer.unobserve(target);
                         }
                     }
                 });
@@ -484,15 +483,60 @@
             });
         }
 
+        // --- TYPING ANIMATION LOGIC (NEW) ---
+
+        /**
+         * Implements the character-by-character typing effect.
+         * @param {HTMLElement} element - The target P element.
+         * @param {string} text - The full string to type.
+         */
+        function typeWriter(element, text) {
+            let i = 0;
+            element.textContent = ''; // Clear initial content
+            
+            // Add blinking cursor
+            const cursor = document.createElement('span');
+            cursor.className = 'typing-cursor';
+            element.appendChild(cursor);
+
+            const speed = 70; // Typing speed in ms
+
+            function type() {
+                if (i < text.length) {
+                    // Update content: slice the text and append it
+                    element.textContent = text.slice(0, i + 1);
+                    element.appendChild(cursor);
+                    i++;
+                    setTimeout(type, speed);
+                } else {
+                    // Stop typing, but let cursor blink indefinitely
+                    // The cursor is already blinking via CSS animation
+                }
+            }
+            type();
+        }
+        
+        /**
+         * Starts the typing animation sequence.
+         */
+        function startTypingAnimation() {
+            const subtitleElement = document.getElementById('hero-subtitle');
+            const targetText = subtitleElement.getAttribute('data-text');
+
+            if (subtitleElement && targetText) {
+                typeWriter(subtitleElement, targetText);
+            }
+        }
+
+        // --- PRELOADER & HEADER LOGIC ---
+
         /**
          * Handles the initial preloader screen sequence, hiding it after a delay.
          */
         function handlePreloader() {
             const preloader = document.getElementById('preloader');
-            const ninjaCharacter = document.getElementById('ninja-character');
-            if (!preloader || !ninjaCharacter) return;
+            if (!preloader) return;
 
-            // Duration is set to 10 seconds as requested
             const preloaderDuration = 10000; 
 
             setTimeout(() => {
@@ -504,9 +548,11 @@
                     // Completely remove it from the flow
                     preloader.style.display = 'none';
                     
-                    // Trigger header and hero animations after preloader is gone
+                    // Trigger subsequent animations
                     animateHeader();
                     document.querySelector('#hero-text h2').classList.add('line-is-visible');
+                    // Start the new typing animation here
+                    startTypingAnimation(); 
                 }, 1500); 
             }, preloaderDuration); 
         }
@@ -518,7 +564,6 @@
             const header = document.getElementById('main-header');
             setTimeout(() => {
                 if (header) {
-                    // The header-slide-down transition is already in the CSS.
                     header.classList.add('header-visible'); 
                 }
             }, 50); 
